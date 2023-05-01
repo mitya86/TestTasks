@@ -34,21 +34,21 @@
         "botWebAppName": "[concat(parameters('botWebAppPrefix'),parameters('scaleUnit'))]",
   },
   "resources": [
-        {
-            "type": "Microsoft.Network/trafficmanagerprofiles/AzureEndpoints",
-            "apiVersion": "2022-04-01-preview",
-            "name": "[concat(parameters('BotTrafficManager'), '/', variables('scaleUnit'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
+    {
+        "type": "Microsoft.Network/trafficmanagerprofiles/AzureEndpoints",
+        "apiVersion": "2022-04-01-preview",
+        "name": "[concat(parameters('BotTrafficManager'), '/', parameters('scaleUnit'))]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
+        ],
+        "properties": {
+            "endpointStatus": "Enabled",
+            "weight": 1,
+            "geoMapping": [
+                "[parameters('trafficManagerGeoMapping')]"
             ],
-            "properties": {
-                "endpointStatus": "Enabled",
-                "weight": 1,
-                "geoMapping": [
-                    "[parameters('trafficManagerGeoMapping')]"
-                ],
-                "targetResourceId": "[resourceId(variables('resourceGroupName), 'Microsoft.Web/sites', variables('botWebAppName))]"
-            }
+            "targetResourceId": "[resourceId(parameters('resourceGroupName'), 'Microsoft.Web/sites', variables('botWebAppName'))]"
         }
+    }
   ]
 }
