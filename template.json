@@ -2,39 +2,47 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "trafficManagerGeoMapping": {
+        "type": "array",
+        "metadata": {
+            "description": "Traffic Manager Geo Mapping"
+        }
+    },
+    "scaleUnit": {
+            "type": "string",
+            "metadata": {
+                "description": "Describes the scale unit that is to be used to uniquely identify each resource"
+            }
+        },
+    "botWebAppPrefix": {
+        "type": "string",
+        "metadata": {
+            "description": "Prefix of Viva Sales Teams App web app"
+        }
+    },
     "BotTrafficManager": {
       "type": "string"
     }
   },
+  "variables": {
+        "botWebAppName": "[concat(parameters('botWebAppPrefix'),parameters('scaleUnit'))]",
+  },
   "resources": [
-    {
-      "type": "Microsoft.Network/trafficmanagerprofiles",
-      "apiVersion": "2018-04-01",
-      "name": "[parameters('BotTrafficManager')]",
-      "location": "global",
-      "properties": {
-        "profileStatus": "Enabled",
-        "trafficRoutingMethod": "Geographic",
-        "dnsConfig": {
-          "relativeName": "[parameters('BotTrafficManager')]",
-          "ttl": 30
-        },
-        "monitorConfig": {
-          "profileMonitorStatus": "Online",
-          "protocol": "HTTPS",
-          "port": 443,
-          "path": "/",
-          "intervalInSeconds": 30,
-          "toleratedNumberOfFailures": 3,
-          "timeoutInSeconds": 10,
-          "expectedStatusCodeRanges": [
-            {
-              "min": 400,
-              "max": 404
+        {
+            "type": "Microsoft.Network/trafficmanagerprofiles/AzureEndpoints",
+            "apiVersion": "2022-04-01-preview",
+            "name": "[concat(parameters('BotTrafficManager'), '/', variables('scaleUnit'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
+            ],
+            "properties": {
+                "endpointStatus": "Enabled",
+                "weight": 1,
+                "geoMapping": [
+                    "[parameters('trafficManagerGeoMapping')]"
+                ],
+                "targetResourceId": "[resourceId(variables('resourceGroupName), 'Microsoft.Web/sites', variables('botWebAppName))]"
             }
-          ]
         }
-      }
-    }
   ]
 }
