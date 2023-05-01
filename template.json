@@ -22,6 +22,12 @@
     },
     "BotTrafficManager": {
       "type": "string"
+    },
+    "resourcegroupname": {
+        "type": "string",
+        "metadata": {
+            "description": "resourcegroupname"
+        }
     }
   },
   "variables": {
