@@ -15,7 +15,7 @@
             "value": "salesproductivityrgdev3"
         },
         "trafficManagerGeoMapping": {
-            "value": "[array('WORLD')]"
+            "value": ["WORLD"]
         }        
     }
 }
