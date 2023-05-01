@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "BotTrafficManager": {
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/trafficmanagerprofiles",
+      "apiVersion": "2018-04-01",
+      "name": "[parameters('BotTrafficManager')]",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Geographic",
+        "dnsConfig": {
+          "relativeName": "[parameters('BotTrafficManager')]",
+          "ttl": 30
+        },
+        "monitorConfig": {
+          "profileMonitorStatus": "Online",
+          "protocol": "HTTPS",
+          "port": 443,
+          "path": "/",
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10,
+          "expectedStatusCodeRanges": [
+            {
+              "min": 400,
+              "max": 404
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
