@@ -94,9 +94,6 @@
         },
         "BotTrafficManager": {
             "value": "bottrafficmanagerdev3"
-        },
-        "env_type": {
-            "value": "Dev"
         }
     }
 }
