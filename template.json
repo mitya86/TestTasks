@@ -120,9 +120,6 @@
         "msAppId": {
             "type": "string"
         },
-        "MicrosoftAppPassword": {
-            "type": "string"
-        },
         "trafficManagerGeoMapping": {
             "type": "array",
             "metadata": {
@@ -368,9 +365,13 @@
                             "name": "MicrosoftAppId",
                             "value": "[parameters('msAppId')]"
                         },
-                        {
-                            "name": "MicrosoftAppPassword",
-                            "value": "[parameters('MicrosoftAppPassword')]"
+                        "MicrosoftAppPassword": {
+                            "reference": {
+                                "keyvault": {
+                                    "id": "[resourceId('salesproductivityrgdev3','Microsoft.KeyVault/vaults', 'spkeyvaultdev3')]"
+                                },
+                                "secretName": "VivaBotAppSecret"
+                            }
                         },
                         {
                             "name": "MRServiceBasePath",
