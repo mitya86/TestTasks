@@ -94,6 +94,14 @@
         },
         "BotTrafficManager": {
             "value": "bottrafficmanagerdev3"
-        }
+        },
+        "MicrosoftAppPassword": {
+            "reference": {
+                "keyvault": {
+                    "id": "[resourceId('salesproductivityrgdev3','Microsoft.KeyVault/vaults', 'spkeyvaultdev3')]"
+                },
+                "secretName": "[variables('VivaAppSecretKeyName')]"
+            }
+        },
     }
 }
