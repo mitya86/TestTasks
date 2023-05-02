@@ -1,21 +1,102 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
+    "parameters": {       
         "scaleUnit": {
             "value": "dev3"
-        },
-        "BotTrafficManager": {
-            "value": "bottrafficmanagerdev3"
         },
         "botWebAppPrefix": {
             "value": "salesproductivitybot"
         },
+        "spWebAppHostingPlanPrefix": {
+            "value": "spservicehostingplan"
+        },
+        "WEBSITE_LOAD_CERTIFICATES": {
+            "value": "*"
+        },
+        "vaults_salesproductivity_name": {
+            "value": "spkeyvaultdev3"
+        },
+        "botPackageLink": {
+            "value": "https://salesproductivitybuilds.blob.core.windows.net/artifacts/9.2.23109.21/SalesProductivityBot.zip?sp=racw&st=2023-03-02T20:33:18Z&se=2025-04-02T03:33:18Z&spr=https&sv=2021-12-02&sr=c&sig=2yoxxnivhFCghO0xYY80ROows3uCeMiYtlbOObyxtoE%3D"
+        },
         "resourcegroupname": {
             "value": "salesproductivityrgdev3"
         },
+        "customdomainappservice": {
+            "value": "dev3service.salesproductivity.dynamics.microsoft.com"
+        },
+        "customdomainbotappservice": {
+            "value": "dev3bot.salesproductivity.dynamics.microsoft.com"
+        },
+        "customdomaincdnendpoint": {
+            "value": "dev3.salesproductivity.dynamics.microsoft.com"
+        },
+        "MSTeamsVivaSalesAppId": {
+            "value": "98a882ae-a7eb-4414-982a-346a766f4a50"
+        },
+        "MRServiceBasePath": {
+            "value": "https://2.dev.api.media.recording.dynamics.com"
+        },
+        "WEBSITE_FIRST_PARTY_ID": {
+            "value": "AntMDS"
+        },
+        "vivaSalesClientAppId": {
+            "value": "81a0a483-a486-403d-be85-a2ced237ed03"
+        },
+        "vivaSalesValidAudiences0": {
+            "value": "api://localhost:3000/81a0a483-a486-403d-be85-a2ced237ed03"
+        },
+        "firstPartyEncryptionCertSubjectName": {
+            "value": "CN=tipencryption.salesproductivity.dynamics.com"
+        },
+        "CommonTenant": {
+            "value": "common"
+        },
+        "Sendx5cBool": {
+            "value": "true"
+        },
+        "vivaSalesClientCertName": {
+            "value": "salesproductivity-encryption-dev3"
+        },
+        "vivaSalesSSLCertName": {
+            "value": "salesproductivity-ssl"
+        },
+        "KeyvaultLiteral": {
+            "value": "KeyVault"
+        },
+        "IsFirstPartyApp": {
+            "value": true
+        },
+        "isBAPApiRoutingRequired": {
+            "value": false
+        },
+        "enableSFS2SAuth": {
+            "value": false
+        },
+        "tokenCacheExpiryMinutes": {
+            "value": 60
+        },
+        "msAppId": {
+            "value": "ae21179b-3c2a-4d8b-bd8f-ac34e96c0429"
+        },
+        "CIAppId": {
+            "value": "b80a77b1-a78c-4655-9283-e40bbc285af0"
+        },
+        "MRAppId": {
+            "value": "399ccdfa-40af-4d33-b122-d0146fcc5c90"
+        },
+        "CIAppResources": {
+            "value": "https://dev.sales.ai.dynamics.com"
+        },
         "trafficManagerGeoMapping": {
-            "value": ["WORLD"]
-        }        
+            "value": [ "WORLD" ]
+        },
+        "BotTrafficManager": {
+            "value": "bottrafficmanagerdev3"
+        },
+        "env_type": {
+            "value": "Dev"
+        }
     }
 }
