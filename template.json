@@ -485,9 +485,7 @@
             "properties": {
                 "endpointStatus": "Enabled",
                 "weight": 1,
-                "geoMapping": [
-                    "[parameters('trafficManagerGeoMapping')]"
-                ],
+                "geoMapping": "[parameters('trafficManagerGeoMapping')]",
                 "targetResourceId": "[resourceId(parameters('resourceGroupName'), 'Microsoft.Web/sites', variables('botWebAppName'))]"
             }
         }
