@@ -1,493 +1,95 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "scaleUnit": {
-            "type": "string",
-            "metadata": {
-                "description": "Describes the scale unit that is to be used to uniquely identify each resource"
-            }
-        },
-        "botWebAppPrefix": {
-            "type": "string",
-            "metadata": {
-                "description": "Prefix of Viva Sales Teams App web app"
-            }
-        },
-        "spWebAppHostingPlanPrefix": {
-            "type": "string",
-            "metadata": {
-                "description": "Prefix of Sales Productivity Web App hosting plan"
-            }
-        },
-        "WEBSITE_LOAD_CERTIFICATES": {
-            "type": "string",
-            "metadata": {
-                "description": "WEBSITE_LOAD_CERTIFICATES"
-            }
-        },
-        "vaults_salesproductivity_name": {
-            "type": "string",
-            "metadata": {
-                "description": "Keyvault name"
-            }
-        },
-        "botPackageLink": {
-            "type": "string",
-            "metadata": {
-                "description": "Ev2 Deploy Url for Viva Sales Bot Service Package"
-            }
-        },
-        "resourcegroupname": {
-            "type": "string",
-            "metadata": {
-                "description": "resourcegroupname"
-            }
-        },
-        "customdomainappservice": {
-            "type": "string",
-            "metadata": {
-                "description": "Custom domain Sales Productivity App service"
-            }
-        },
-        "customdomainbotappservice": {
-            "type": "string",
-            "metadata": {
-                "description": "Custom domain for Bot App Service"
-            }
-        },
-        "customdomaincdnendpoint": {
-            "type": "string",
-            "metadata": {
-                "description": "Custom Domain CDN Endpoint"
-            }
-        },
-        "MSTeamsVivaSalesAppId": {
-            "type": "string",
-            "metadata": {
-                "description": "Viva Sales Teams app id"
-            }
-        },
-        "MRServiceBasePath": {
-            "type": "string",
-            "metadata": {
-                "description": "MRServiceBasePath"
-            }
-        },
-        "WEBSITE_FIRST_PARTY_ID": {
-            "type": "string"
-        },
-        "vivaSalesClientAppId": {
-            "type": "string"
-        },
-        "vivaSalesValidAudiences0": {
-            "type": "string"
-        },
-        "firstPartyEncryptionCertSubjectName": {
-            "type": "string"
-        },
-        "CommonTenant": {
-            "type": "string"
-        },
-        "Sendx5cBool": {
-            "type": "string"
-        },
-        "vivaSalesClientCertName": {
-            "type": "string"
-        },
-        "vivaSalesSSLCertName": {
-            "type": "string"
-        },
-        "KeyvaultLiteral": {
-            "type": "string"
-        },
-        "IsFirstPartyApp": {
-            "type": "bool"
-        },
-        "vnet": {
-            "defaultValue": "vnet-salesproductivity",
-            "type": "string"
-        },
-        "isBAPApiRoutingRequired": {
-            "type": "bool"
-        },
-        "enableSFS2SAuth": {
-            "type": "bool"
-        },
-        "tokenCacheExpiryMinutes": {
-            "type": "int"
-        },
-        "msAppId": {
-            "type": "string"
-        },
-        "trafficManagerGeoMapping": {
-            "type": "array",
-            "metadata": {
-                "description": "Traffic Manager Geo Mapping"
-            }
-        },
-        "CIAppId": {
-            "type": "string",
-            "metadata": {
-                "description": "CIAppId"
-            }
-        },
-        "CIAppResources": {
-            "type": "string"
-        },
-        "MRAppId": {
-            "type": "string"
-        },
-        "BotTrafficManager": {
-            "type": "string"
-        },
-        "MicrosoftAppPassword": {
-            "type": "string"
-        },
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "scaleUnit": {
+      "type": "string",
+      "metadata": {
+        "description": "Describes the scale unit that is to be used to uniquely identify each resource"
+      }
     },
-    "variables": {
-        "kvRbacRoleActions": [
-            "Microsoft.Authorization/*/read",
-            "Microsoft.Insights/alertRules/*",
-            "Microsoft.Resources/deployments/*",
-            "Microsoft.Resources/subscriptions/resourceGroups/read",
-            "Microsoft.Support/*",
-            "Microsoft.KeyVault/checkNameAvailability/read",
-            "Microsoft.KeyVault/deletedVaults/read",
-            "Microsoft.KeyVault/locations/*/read",
-            "Microsoft.KeyVault/vaults/*/read",
-            "Microsoft.KeyVault/operations/read"
-        ],
-        "kvRbacRoleDataActions": [
-            "Microsoft.KeyVault/vaults/secrets/getSecret/action",
-            "Microsoft.KeyVault/vaults/secrets/readMetadata/action",
-            "Microsoft.KeyVault/vaults/keys/read",
-            "Microsoft.KeyVault/vaults/certificates/read"
-        ],
-        "kvRbacRoleDefName": "[guid(subscription().id, parameters('scaleUnit'), string(variables('kvRbacRoleActions')), string(variables('kvRbacRoleDataActions')))]",
-        "kvRbacDynamicsKVRoleID": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', string(variables('kvRbacRoleDefName')))]",
-        "kvRbacCryptoServiceEncryptionUserRoleID": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')]",
-        "location": "[resourceGroup().location]",
-        "spWebAppHostingPlanName": "[concat(parameters('spWebAppHostingPlanPrefix'),parameters('scaleUnit'))]",
-        "botWebAppName": "[concat(parameters('botWebAppPrefix'),parameters('scaleUnit'))]",
-        "botAppserviceCustomDomainName": "[concat(variables('botWebAppName'), '/', parameters('customdomainbotappservice'))]",
-        "botPackageLink": "[parameters('botPackageLink')]",
-        "vnetName": "[concat(parameters('vnet'),parameters('scaleUnit'))]",
-        "redisCacheConfStringSecretName": "redisServerConfString",
-        "kvUrl": "[concat('https://', parameters('vaults_salesproductivity_name'), '.vault.azure.net/')]",
-        "renameMSDeployLockedFiles": 1,
-        "identityResourceId": "[concat(resourceId('Microsoft.Web/sites', variables('botWebAppName')),'/providers/Microsoft.ManagedIdentity/Identities/default')]"
+    "isBotCreationEnabled": {
+      "type": "string"
+    },
+    "msAppId": {
+      "type": "string"
+    },
+    "BotTrafficManager": {
+      "type": "string"
+    },
+    "BotTrafficManagerDNS": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "botPrefix": "VivaSalesBot",
+    "botId": "[concat(variables('botPrefix'),parameters('scaleUnit'))]",
+    "BotEndpoint":"[concat('https://', parameters('BotTrafficManagerDNS'), '/api/Bot/PostAsync' )]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/trafficmanagerprofiles",
+      "apiVersion": "2018-04-01",
+      "name": "[parameters('BotTrafficManager')]",
+      "location": "global",
+      "properties": {
+        "profileStatus": "Enabled",
+        "trafficRoutingMethod": "Geographic",
+        "dnsConfig": {
+          "relativeName": "[parameters('BotTrafficManager')]",
+          "ttl": 30
         },
-    "resources": [
-        {
-            "type": "Microsoft.Web/certificates",
-            "name": "[parameters('vivaSalesClientCertName')]",
-            "apiVersion": "2016-03-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "keyVaultId": "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_salesproductivity_name'))]",
-                "keyVaultSecretName": "[parameters('vivaSalesClientCertName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',  variables('spWebAppHostingPlanName'))]"
+        "monitorConfig": {
+          "profileMonitorStatus": "Online",
+          "protocol": "HTTPS",
+          "port": 443,
+          "path": "/",
+          "intervalInSeconds": 30,
+          "toleratedNumberOfFailures": 3,
+          "timeoutInSeconds": 10,
+          "expectedStatusCodeRanges": [
+            {
+              "min": 400,
+              "max": 404
             }
-        },
-        {
-            "type": "Microsoft.Web/certificates",
-            "name": "[parameters('vivaSalesSSLCertName')]",
-            "apiVersion": "2016-03-01",
-            "location": "[variables('location')]",
-            "properties": {
-                "keyVaultId": "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_salesproductivity_name'))]",
-                "keyVaultSecretName": "[parameters('vivaSalesSSLCertName')]",
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms',  variables('spWebAppHostingPlanName'))]"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(variables('botWebAppName'), '/web')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('botWebAppName'))]"
-            ],
-            "properties": {
-                "virtualApplications": [
-                    {
-                        "virtualPath": "/",
-                        "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": true
-                    }
-                ],
-                "cors": {
-                    "allowedOrigins": [],
-                    "supportCredentials": false
-                },
-                "minTlsVersion": "1.2",
-                "httpsOnly": true,
-                "vnetRouteAllEnabled": true
-            }
-        },
-        {
-            "apiVersion": "2018-11-01",
-            "type": "Microsoft.Web/sites",
-            "kind": "app",
-            "name": "[variables('botWebAppName')]",
-            "location": "[variables('location')]",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('spWebAppHostingPlanName'))]",
-                "httpsOnly": true,
-                "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), 'default')]",
-                "siteConfig": {
-                    "location": "[variables('location')]",
-                    "hostNameSslStates": [
-                        {
-                            "name": "[parameters('customdomainbotappservice')]",
-                            "sslState": "SniEnabled",
-                            "hostType": "Standard",
-                            "thumbprint": "[reference(resourceId('Microsoft.Web/certificates', parameters('vivaSalesSSLCertName'))).Thumbprint]"
-                        },
-                        {
-                            "name": "[concat(variables('botWebAppName'),'.azurewebsites.net')]",
-                            "sslState": "Disabled",
-                            "virtualIP": null,
-                            "thumbprint": null,
-                            "toUpdate": null,
-                            "hostType": "Standard"
-                        },
-                        {
-                            "name": "[concat(variables('botWebAppName'),'.scm.azurewebsites.net')]",
-                            "sslState": "Disabled",
-                            "virtualIP": null,
-                            "thumbprint": null,
-                            "toUpdate": null,
-                            "hostType": "Repository"
-                        }
-                    ],
-                    "minTlsVersion": "1.2",
-                    "AlwaysOn": true,
-                    "appSettings": [
-                        {
-                            "name": "RedisCache__ConnectionString",
-                            "value": "[concat('@Microsoft.KeyVault(VaultName=', parameters('vaults_salesproductivity_name'), ';SecretName=', variables('redisCacheConfStringSecretName'), ')')]"
-                        },
-                        {
-                            "name": "AzureAd__ClientId",
-                            "value": "[parameters('vivaSalesClientAppId')]"
-                        },
-                        {
-                            "name": "AzureAd__TenantId",
-                            "value": "[parameters('CommonTenant')]"
-                        },
-                        {
-                            "name": "AzureAd__SendX5C",
-                            "value": "[parameters('Sendx5cBool')]"
-                        },
-                        {
-                            "name": "AzureAd__ClientCertificates__0__KeyVaultUrl",
-                            "value": "[variables('kvUrl')]"
-                        },
-                        {
-                            "name": "AzureAd__ClientCertificates__0__SourceType",
-                            "value": "[parameters('KeyvaultLiteral')]"
-                        },
-                        {
-                            "name": "AzureAd__ClientCertificates__0__KeyVaultCertificateName",
-                            "value": "[parameters('vivaSalesClientCertName')]"
-                        },
-                        {
-                            "name": "AzureAd__InboundPolicies__1__TokenValidationPolicy__ValidAudiences__0",
-                            "value": "[parameters('vivaSalesValidAudiences0')]"
-                        },
-                        {
-                            "name": "AzureAd__InboundPolicies__1__ValidAudiences__0",
-                            "value": "[parameters('vivaSalesValidAudiences0')]"
-                        },
-                        {
-                            "name": "AzureAd__InboundPolicies__1__TokenValidationPolicy__TokenDecryptionCertificates__0__KeyVaultUrl",
-                            "value": "[variables('kvUrl')]"
-                        },
-                        {
-                            "name": "AzureAd__InboundPolicies__1__TokenValidationPolicy__TokenDecryptionCertificates__0__SourceType",
-                            "value": "[parameters('KeyvaultLiteral')]"
-                        },
-                        {
-                            "name": "AzureAd__InboundPolicies__1__TokenValidationPolicy__TokenDecryptionCertificates__0__KeyVaultCertificateName",
-                            "value": "[parameters('vivaSalesClientCertName')]"
-                        },
-                        {
-                            "name": "MSTeamsVivaSalesAppId",
-                            "value": "[parameters('MSTeamsVivaSalesAppId')]"
-                        },
-                        {
-                            "name": "WEBSITE_LOAD_CERTIFICATES",
-                            "value": "[parameters('WEBSITE_LOAD_CERTIFICATES')]"
-                        },
-                        {
-                            "name": "WEBSITE_FIRST_PARTY_ID",
-                            "value": "[parameters('WEBSITE_FIRST_PARTY_ID')]"
-                        },
-                        {
-                            "name": "KVUrl",
-                            "value": "[variables('kvUrl')]"
-                        },
-                        {
-                            "name": "WEBSITE_VNET_ROUTE_ALL",
-                            "value": 1
-                        },
-                        {
-                            "name": "enableSFS2SAuth",
-                            "value": "[parameters('enableSFS2SAuth')]"
-                        },
-                        {
-                            "name": "isBAPApiRoutingRequired",
-                            "value": "[parameters('isBAPApiRoutingRequired')]"
-                        },
-                        {
-                            "name": "FirstPartyAppId",
-                            "value": "[parameters('vivaSalesClientAppId')]"
-                        },
-                        {
-                            "name": "IsFirstPartyApp",
-                            "value": "[parameters('IsFirstPartyApp')]"
-                        },
-                        {
-                            "name": "EncryptionCertificateSubjectName",
-                            "value": "[parameters('firstPartyEncryptionCertSubjectName')]"
-                        },
-                        {
-                            "name": "EncryptionCertificateName",
-                            "value": "[parameters('vivaSalesClientCertName')]"
-                        },
-                        {
-                            "name": "serviceName",
-                            "value": "[parameters('customdomainappservice')]"
-                        },
-                        {
-                            "name": "MicrosoftAppId",
-                            "value": "[parameters('msAppId')]"
-                        },
-                        {
-                            "name": "MicrosoftAppPassword",
-                            "value": "[parameters('MicrosoftAppPassword')]"
-                        },
-                        {
-                            "name": "MRServiceBasePath",
-                            "value": "[parameters('MRServiceBasePath')]"
-                        },
-                        {
-                            "name": "tokenCacheExpiryMinutes",
-                            "value": "[parameters('tokenCacheExpiryMinutes')]"
-                        },
-                        {
-                            "name": "cdnEndpoint",
-                            "value": "[parameters('customdomaincdnendpoint')]"
-                        },
-                        {
-                            "name": "CIAppId",
-                            "value": "[parameters('CIAppId')]"
-                        },
-                        {
-                            "name": "CIAppResources",
-                            "value": "[parameters('CIAppResources')]"
-                        },
-                        {
-                            "name": "MRAppId",
-                            "value": "[parameters('MRAppId')]"
-                        },
-                        {
-                            "name": "MSDEPLOY_RENAME_LOCKED_FILES",
-                            "value": "[variables('renameMSDeployLockedFiles')]"
-                        }
-                    ]
-                }
-            },
-            "resources": [
-                {
-                    "name": "[concat(variables('botWebAppName'), '/MSDeploy')]",
-                    "type": "Microsoft.Web/sites/extensions",
-                    "apiVersion": "2015-08-01",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
-                    ],
-                    "properties": {
-                        "packageUri": "[variables('botPackageLink')]"
-                    }
-                },
-                {
-                    "name": "virtualNetwork",
-                    "type": "networkConfig",
-                    "apiVersion": "2022-03-01",
-                    "location": "[variables('location')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
-                    ],
-                    "properties": {
-                        "subnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), 'default')]",
-                        "swiftSupported": true
-                    }
-                }
-            ],
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/certificates',parameters('vivaSalesClientCertName'))]",
-                "[resourceId('Microsoft.Web/certificates',parameters('vivaSalesSSLCertName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "apiVersion": "2021-03-01",
-            "name": "[variables('botAppserviceCustomDomainName')]",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('botWebAppName'))]",
-                "[resourceId('Microsoft.Web/certificates',parameters('vivaSalesClientCertName'))]",
-                "[resourceId('Microsoft.Web/certificates',parameters('vivaSalesSSLCertName'))]"
-            ],
-            "properties": {
-                "siteName": "[variables('botWebAppName')]",
-                "sslState": "SniEnabled",
-                "thumbprint": "[reference(resourceId('Microsoft.Web/certificates', parameters('vivaSalesSSLCertName'))).Thumbprint]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[guid(uniqueString(variables('botWebAppName'), parameters('scaleUnit'), subscription().subscriptionId))]",
-            "properties": {
-                "roleDefinitionId": "[variables('kvRbacDynamicsKVRoleID')]",
-                "principalId": "[reference(variables('identityResourceId'), '2015-08-31-PREVIEW').principalId]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2022-04-01",
-            "name": "[guid(subscription().subscriptionId, resourceGroup().name, variables('botWebAppName'), 'kvRbacCryptoServiceEncryptionUserRoleID')]",
-            "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_salesproductivity_name'))]",
-            "properties": {
-                "roleDefinitionId": "[variables('kvRbacCryptoServiceEncryptionUserRoleID')]",
-                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('botWebAppName')), '2021-03-01', 'Full').identity.principalId]"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/trafficmanagerprofiles/AzureEndpoints",
-            "apiVersion": "2022-04-01-preview",
-            "name": "[concat(parameters('BotTrafficManager'), '/', parameters('customdomainbotappservice'))]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/Sites', variables('botWebAppName'))]"
-            ],
-            "properties": {
-                "endpointStatus": "Enabled",
-                "weight": 1,
-                "geoMapping": "[parameters('trafficManagerGeoMapping')]",
-                "targetResourceId": "[resourceId(parameters('resourceGroupName'), 'Microsoft.Web/sites', variables('botWebAppName'))]"
-            }
+          ]
         }
-    ]
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices",
+      "condition": "[equals(parameters('isBotCreationEnabled'), 'yes')]",
+      "name": "[variables('botId')]",
+      "kind": "azurebot",
+      "apiVersion": "2021-03-01",
+      "location": "global",
+      "sku": {
+          "name": "S1"
+      },
+      "properties": {
+        "displayName": "[variables('botId')]",
+        "msaAppType": "MultiTenant",
+        "msaAppId": "[parameters('msAppId')]",
+        "msaAppTenantId": "",
+        "endpoint": "[variables('BotEndpoint')]"
+      }
+    },
+    {
+      "type": "Microsoft.BotService/botServices/channels",
+      "apiVersion": "2021-03-01",
+      "name": "[concat(variables('botId'), '/MsTeamsChannel')]",
+      "condition": "[equals(parameters('isBotCreationEnabled'), 'yes')]",
+      "location": "global",
+      "dependsOn": [
+          "[resourceId('Microsoft.BotService/botServices', variables('botId'))]"
+      ],
+      "properties": {
+        "properties": {
+          "enableCalling": false,
+          "isEnabled": true
+        },
+        "channelName": "MsTeamsChannel"
+      }
+    }
+  ]
 }
