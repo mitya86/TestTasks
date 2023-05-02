@@ -365,13 +365,9 @@
                             "name": "MicrosoftAppId",
                             "value": "[parameters('msAppId')]"
                         },
-                        "MicrosoftAppPassword": {
-                            "reference": {
-                                "keyvault": {
-                                    "id": "[resourceId('salesproductivityrgdev3','Microsoft.KeyVault/vaults', 'spkeyvaultdev3')]"
-                                },
-                                "secretName": "VivaBotAppSecret"
-                            }
+                        {
+                            "name": "MicrosoftAppPassword",
+                            "value": "[parameters('MicrosoftAppPassword')]"
                         },
                         {
                             "name": "MRServiceBasePath",
