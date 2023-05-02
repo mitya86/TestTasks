@@ -98,9 +98,9 @@
         "MicrosoftAppPassword": {
             "reference": {
                 "keyvault": {
-                    "id": "[resourceId('salesproductivityrgdev3','Microsoft.KeyVault/vaults', 'spkeyvaultdev3')]"
+                    "id": "/subscriptions/9a5c4b4c-6593-4b3e-9660-26a1e5c8a273/resourceGroups/salesproductivityrgdev3/providers/Microsoft.KeyVault/vaults/spkeyvaultdev3"
                 },
-                "secretName": "[variables('VivaAppSecretKeyName')]"
+                "secretName": "VivaBotAppSecret"
             }
         },
     }
