@@ -24,13 +24,13 @@
             "value": "salesproductivityrgdev3"
         },
         "customdomainappservice": {
-            "value": "dev3service.salesproductivity.dynamics.microsoft.com"
+            "value": "dev3service.salesproductivity.dynamics.com"
         },
         "customdomainbotappservice": {
-            "value": "dev3bot.salesproductivity.dynamics.microsoft.com"
+            "value": "dev3bot.salesproductivity.dynamics.com"
         },
         "customdomaincdnendpoint": {
-            "value": "dev3.salesproductivity.dynamics.microsoft.com"
+            "value": "dev3.salesproductivity.dynamics.com"
         },
         "MSTeamsVivaSalesAppId": {
             "value": "98a882ae-a7eb-4414-982a-346a766f4a50"
