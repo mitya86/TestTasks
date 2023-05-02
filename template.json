@@ -465,7 +465,7 @@
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2022-04-01",
-            "name": "[guid(subscription().subscriptionId , resourceGroup().name, 'kvRbacCryptoServiceEncryptionUserRoleID')]",
+            "name": "[guid(subscription().subscriptionId, resourceGroup().name, variables('botWebAppName'), 'kvRbacCryptoServiceEncryptionUserRoleID')]",
             "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('vaults_salesproductivity_name'))]",
             "properties": {
                 "roleDefinitionId": "[variables('kvRbacCryptoServiceEncryptionUserRoleID')]",
