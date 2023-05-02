@@ -140,7 +140,10 @@
         },
         "BotTrafficManager": {
             "type": "string"
-        }
+        },
+        "MicrosoftAppPassword": {
+            "type": "string"
+        },
     },
     "variables": {
         "kvRbacRoleActions": [
