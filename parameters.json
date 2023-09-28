@@ -2,20 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {       
-        "scaleUnit": {
-            "value": "dev3"
-        },
-        "msAppId": {
-            "value": "ae21179b-3c2a-4d8b-bd8f-ac34e96c0429"
-        },
-        "BotTrafficManager": {
-            "value": "bottrafficmanagerdev3"
-        },
-        "BotTrafficManagerDNS": {
-            "value": "dev3bottrafficmanager.salesproductivity.dynamics.com"
-        },
-        "isBotCreationEnabled": {
-            "value": "yes"
+        "buildVersion": {
+            "value": "1.0.0.0"
         }
     }
 }
