@@ -16,10 +16,10 @@
     "servicePackageLink": "https://salesproductivitybuilds.blob.core.windows.net/artifacts/9.8.23263.31/VivaSalesBotService.zip?sv=2021-10-04&st=2023-09-21T00%3A01%3A11Z&se=2023-09-21T01%3A01%3A11Z&sr=c&sp=r&sig=6VnMt%2BMGijyvxloyZgGRmqFhdq0mcLuXnmiIhHkwo%2Bw%3D"
   },
   "resources": [
-    {
+{
             "type": "Microsoft.Web/sites/slots",
             "apiVersion": "2018-02-01",
-            "name": "/staging",
+            "name": "[concat(variables('spWebAppName'), '/staging')]",
             "location": "[variables('location')]",
             "kind": "app",
             "properties": {
@@ -43,8 +43,7 @@
                     "type": "Extensions",
                     "apiVersion": "2018-02-01",
                     "dependsOn": [
-                        "staging"
-                        ],
+                        "[resourceId('Microsoft.Web/sites/slots', variables('spWebAppName'), 'staging')]"],
                     "properties": {
                         "packageUri": "[variables('servicePackageLink')]"
                     }
