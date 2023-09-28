@@ -2,94 +2,54 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "scaleUnit": {
-      "type": "string",
-      "metadata": {
-        "description": "Describes the scale unit that is to be used to uniquely identify each resource"
-      }
-    },
-    "isBotCreationEnabled": {
-      "type": "string"
-    },
-    "msAppId": {
-      "type": "string"
-    },
-    "BotTrafficManager": {
-      "type": "string"
-    },
-    "BotTrafficManagerDNS": {
-      "type": "string"
+    "buildVersion": {
+        "type": "string",
+        "defaultValue": "",
+        "metadata": {
+            "description": "Build version for the site, needed for slot auto-swap."
+        }
     }
   },
   "variables": {
-    "botPrefix": "VivaSalesBot",
-    "botId": "[concat(variables('botPrefix'),parameters('scaleUnit'))]",
-    "BotEndpoint":"[concat('https://', parameters('BotTrafficManagerDNS'), '/api/Bot/PostAsync' )]"
+    "location": "[resourceGroup().location]",
+    "spWebAppName": "salesproductivitybotint",
+    "servicePackageLink": "https://salesproductivitybuilds.blob.core.windows.net/artifacts/9.8.23263.31/VivaSalesBotService.zip?sv=2021-10-04&st=2023-09-21T00%3A01%3A11Z&se=2023-09-21T01%3A01%3A11Z&sr=c&sp=r&sig=6VnMt%2BMGijyvxloyZgGRmqFhdq0mcLuXnmiIhHkwo%2Bw%3D"
   },
   "resources": [
     {
-      "type": "Microsoft.Network/trafficmanagerprofiles",
-      "apiVersion": "2018-04-01",
-      "name": "[parameters('BotTrafficManager')]",
-      "location": "global",
-      "properties": {
-        "profileStatus": "Enabled",
-        "trafficRoutingMethod": "Geographic",
-        "dnsConfig": {
-          "relativeName": "[parameters('BotTrafficManager')]",
-          "ttl": 30
-        },
-        "monitorConfig": {
-          "profileMonitorStatus": "Online",
-          "protocol": "HTTPS",
-          "port": 443,
-          "path": "/",
-          "intervalInSeconds": 30,
-          "toleratedNumberOfFailures": 3,
-          "timeoutInSeconds": 10,
-          "expectedStatusCodeRanges": [
-            {
-              "min": 400,
-              "max": 404
-            }
-          ]
+            "type": "Microsoft.Web/sites/slots",
+            "apiVersion": "2018-02-01",
+            "name": "[concat(variables('spWebAppName'), '/staging')]",
+            "location": "[variables('location')]",
+            "kind": "app",
+            "properties": {
+                "buildVersion": "[parameters('buildVersion')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
+                            "value": "/health"
+                        },
+                        {
+                            "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
+                            "value": "200,202"
+                        }
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "name": "MSDeploy",
+                    "type": "Extensions",
+                    "apiVersion": "2022-09-01",
+                    "dependsOn": [
+                        "[concat(variables('spWebAppName'), 'staging')]"
+                        ],
+                    "properties": {
+                        "packageUri": "[variables('servicePackageLink')]"
+                    }
+                }
+            ]
         }
-      }
-    },
-    {
-      "type": "Microsoft.BotService/botServices",
-      "condition": "[equals(parameters('isBotCreationEnabled'), 'yes')]",
-      "name": "[variables('botId')]",
-      "kind": "azurebot",
-      "apiVersion": "2021-03-01",
-      "location": "global",
-      "sku": {
-          "name": "S1"
-      },
-      "properties": {
-        "displayName": "[variables('botId')]",
-        "msaAppType": "MultiTenant",
-        "msaAppId": "[parameters('msAppId')]",
-        "msaAppTenantId": "",
-        "endpoint": "[variables('BotEndpoint')]"
-      }
-    },
-    {
-      "type": "Microsoft.BotService/botServices/channels",
-      "apiVersion": "2021-03-01",
-      "name": "[concat(variables('botId'), '/MsTeamsChannel')]",
-      "condition": "[equals(parameters('isBotCreationEnabled'), 'yes')]",
-      "location": "global",
-      "dependsOn": [
-          "[resourceId('Microsoft.BotService/botServices', variables('botId'))]"
-      ],
-      "properties": {
-        "properties": {
-          "enableCalling": false,
-          "isEnabled": true
-        },
-        "channelName": "MsTeamsChannel"
-      }
-    }
   ]
 }
