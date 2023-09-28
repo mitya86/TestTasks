@@ -19,7 +19,7 @@
     {
             "type": "Microsoft.Web/sites/slots",
             "apiVersion": "2018-02-01",
-            "name": "[concat(variables('spWebAppName'), '/staging')]",
+            "name": "/staging",
             "location": "[variables('location')]",
             "kind": "app",
             "properties": {
@@ -43,7 +43,7 @@
                     "type": "Extensions",
                     "apiVersion": "2018-02-01",
                     "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites/slots', variables('spWebAppName'), 'staging')]"
+                        "staging"
                         ],
                     "properties": {
                         "packageUri": "[variables('servicePackageLink')]"
