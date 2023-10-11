@@ -1,41 +1,67 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "buildVersion": {
-        "type": "string",
-        "defaultValue": "",
-        "metadata": {
-            "description": "Build version for the site, needed for slot auto-swap."
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "buildVersion": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Build version for the site, needed for slot auto-swap."
+            }
         }
-    }
-  },
-  "variables": {
-    "location": "[resourceGroup().location]",
-    "spWebAppName": "salesproductivityserviceint",
-    "servicePackageLink": "https://salesproductivitybuilds.blob.core.windows.net/artifacts/9.8.23263.31/VivaSalesBotService.zip?sv=2021-10-04&st=2023-09-21T00%3A01%3A11Z&se=2023-09-21T01%3A01%3A11Z&sr=c&sp=r&sig=6VnMt%2BMGijyvxloyZgGRmqFhdq0mcLuXnmiIhHkwo%2Bw%3D"
-  },
-  "resources": [
-{
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "spWebAppHostingPlanName": "testservicehostingplan",
+        "spWebAppName": "dmlutytstestservice"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('spWebAppName'), '/web')]",
+            "location": "[variables('location')]",
+            "dependsOn": ["[resourceId('Microsoft.Web/sites', variables('spWebAppName'))]"],
+            "properties": {
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "cors": {
+                    "allowedOrigins": [],
+                    "supportCredentials": false
+                },
+                "minTlsVersion": "1.2",
+                "httpsOnly": true,
+                "vnetRouteAllEnabled": true
+            }
+        },
+        {
+            "apiVersion": "2018-02-01",
+            "type": "Microsoft.Web/serverfarms",
+            "kind": "app",
+            "name": "[variables('spWebAppHostingPlanName')]",
+            "location": "[variables('location')]",
+            "properties": {},
+            "dependsOn": [],
+            "sku": {
+                "name": "S1"
+            }
+        },
+        {
             "type": "Microsoft.Web/sites/slots",
             "apiVersion": "2018-02-01",
             "name": "[concat(variables('spWebAppName'), '/staging')]",
             "location": "[variables('location')]",
             "kind": "app",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('spWebAppName'))]"
+            ],
             "properties": {
-                "buildVersion": "[parameters('buildVersion')]",
-                "siteConfig": {
-                    "appSettings": [
-                        {
-                            "name": "WEBSITE_SWAP_WARMUP_PING_PATH",
-                            "value": "/health"
-                        },
-                        {
-                            "name": "WEBSITE_SWAP_WARMUP_PING_STATUSES",
-                            "value": "200,202"
-                        }
-                    ]
-                }
+                "buildVersion": "[parameters('buildVersion')]"
             },
             "resources": [
                 {
@@ -43,13 +69,44 @@
                     "type": "Extensions",
                     "apiVersion": "2018-02-01",
                     "dependsOn": [
-                        "[concat('Microsoft.Web/sites', variables('spWebAppName'), '/slots/staging')]"
-                    ],
+                        "[resourceId('Microsoft.Web/sites/slots', variables('spWebAppName'), 'staging')]"],
                     "properties": {
-                        "packageUri": "[variables('servicePackageLink')]"
+                        "packageUri": "https://teststoragemitya.blob.core.windows.net/builds/armtemplates.deps.zip?sp=r&st=2023-10-11T00:13:17Z&se=2023-11-11T09:13:17Z&spr=https&sv=2022-11-02&sr=b&sig=%2BIh2guozwmZJoIpEPxYR17yo6og2j%2BN8QLvtSlRI2%2Bc%3D"
                     }
                 }
             ]
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('spWebAppName')]",
+            "location": "[variables('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "targetBuildVersion": "[parameters('buildVersion')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('spWebAppHostingPlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                    "location": "[variables('location')]",
+                    "minTlsVersion": "1.2",
+                    "appSettings": [
+                        {
+                            "name": "appsetting1",
+                            "value": "1"
+                        },
+                        {
+                            "name": "apsetting2",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('spWebAppHostingPlanName'))]"
+            ]
         }
-  ]
+    ]
 }
